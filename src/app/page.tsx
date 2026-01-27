@@ -1,28 +1,15 @@
+import { TranslationForm } from "@/components/translation-form";
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <main className="flex flex-col items-center gap-8 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Learn Japanese
-        </h1>
-        <p className="max-w-md text-lg text-muted-foreground">
-          Welcome to your Japanese learning application. Start your journey to master the language.
+    <main className="px-4 py-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Add Vocabulary</h1>
+        <p className="text-sm text-muted-foreground">
+          Enter English text to get a Japanese translation
         </p>
-        <div className="flex gap-4">
-          <a
-            href="#"
-            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
-          >
-            Get Started
-          </a>
-          <a
-            href="#"
-            className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
-          >
-            Learn More
-          </a>
-        </div>
-      </main>
-    </div>
+      </div>
+      <TranslationForm />
+    </main>
   );
 }

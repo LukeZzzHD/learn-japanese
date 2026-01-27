@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Navigation } from "@/components/navigation";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Learn Japanese",
-  description: "Japanese learning application",
+  description: "Japanese vocabulary learning application",
 };
 
 export default function RootLayout({
@@ -14,7 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        {children}
+        <div className="mx-auto min-h-screen max-w-[480px] pb-20">
+          {children}
+        </div>
+        <Navigation />
+        <Toaster position="top-center" />
       </body>
     </html>
   );
