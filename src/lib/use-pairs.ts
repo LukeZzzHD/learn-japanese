@@ -1,9 +1,15 @@
 "use client";
 
 import { useSyncExternalStore, useCallback } from "react";
-import { TranslationPair } from "@/types";
+import { type TranslationPair } from "@/types";
+import { normalizeForComparison } from "@/lib/normalize";
 
 const STORAGE_KEY = "translation-pairs";
+const EMPTY_ARRAY: TranslationPair[] = [];
+
+// Cache for getSnapshot to avoid infinite loops with useSyncExternalStore
+let cachedData: string | null = null;
+let cachedPairs: TranslationPair[] = EMPTY_ARRAY;
 
 function subscribe(callback: () => void) {
   window.addEventListener("storage", callback);
@@ -15,13 +21,20 @@ function subscribe(callback: () => void) {
 }
 
 function getSnapshot(): TranslationPair[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return EMPTY_ARRAY;
   const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
+
+  // Only parse and create new array reference when data actually changes
+  if (data !== cachedData) {
+    cachedData = data;
+    cachedPairs = data ? JSON.parse(data) : EMPTY_ARRAY;
+  }
+
+  return cachedPairs;
 }
 
 function getServerSnapshot(): TranslationPair[] {
-  return [];
+  return EMPTY_ARRAY;
 }
 
 export function notifyPairsUpdated() {
@@ -80,11 +93,17 @@ export function usePairs() {
     return available[randomIndex];
   }, [pairs]);
 
+  const findByEnglish = useCallback((english: string): TranslationPair | null => {
+    const normalized = normalizeForComparison(english);
+    return pairs.find((p) => normalizeForComparison(p.english) === normalized) ?? null;
+  }, [pairs]);
+
   return {
     pairs,
     addPair,
     updatePair,
     deletePair,
     getRandomPair,
+    findByEnglish,
   };
 }

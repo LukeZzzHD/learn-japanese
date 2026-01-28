@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
+import { Outfit } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/components/header";
+import { MainContent } from "@/components/main-content";
 import { Navigation } from "@/components/navigation";
 import { Toaster } from "@/components/ui/sonner";
+
+const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Learn Japanese",
@@ -15,10 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">
-        <div className="mx-auto min-h-screen max-w-[480px] pb-20">
-          {children}
-        </div>
+      <body className={`${outfit.variable} font-sans antialiased`}>
+        <Header />
+        <MainContent>{children}</MainContent>
         <Navigation />
         <Toaster position="top-center" />
       </body>
