@@ -5,31 +5,47 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePairs } from "@/lib/use-pairs";
 import { speakJapanese, isSpeechSupported } from "@/lib/speech";
+import { JapaneseDisplay } from "@/components/japanese-display";
 import { TranslationPair } from "@/types";
-import { Volume2, Eye, ArrowRight, Shuffle } from "lucide-react";
+import { Volume2, Eye, ArrowRight, Shuffle, RotateCcw } from "lucide-react";
 import Link from "next/link";
+
+const MAX_QUIZ_CARDS = 10;
 
 export function QuizCard() {
   const { pairs, getRandomPair } = usePairs();
   const [currentPair, setCurrentPair] = useState<TranslationPair | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [started, setStarted] = useState(false);
+  const [shownCount, setShownCount] = useState(0);
+  const [completed, setCompleted] = useState(false);
 
   const speechSupported = typeof window !== "undefined" && isSpeechSupported();
+  const quizSize = Math.min(pairs.length, MAX_QUIZ_CARDS);
 
-  const loadRandomPair = useCallback((excludeId?: string) => {
-    const randomPair = getRandomPair(excludeId);
-    setCurrentPair(randomPair);
-    setRevealed(false);
-  }, [getRandomPair]);
+  const loadRandomPair = useCallback(
+    (excludeId?: string) => {
+      const randomPair = getRandomPair(excludeId);
+      setCurrentPair(randomPair);
+      setRevealed(false);
+    },
+    [getRandomPair]
+  );
 
   const handleStart = () => {
     setStarted(true);
+    setShownCount(1);
+    setCompleted(false);
     loadRandomPair();
   };
 
   const handleNext = () => {
-    loadRandomPair(currentPair?.id);
+    if (shownCount >= quizSize) {
+      setCompleted(true);
+    } else {
+      setShownCount((prev) => prev + 1);
+      loadRandomPair(currentPair?.id);
+    }
   };
 
   const handleSpeak = () => {
@@ -79,9 +95,29 @@ export function QuizCard() {
     );
   }
 
+  if (completed) {
+    return (
+      <Card className="w-full">
+        <CardContent className="flex flex-col items-center justify-center gap-4 py-12">
+          <p className="text-2xl font-semibold">Quiz Complete!</p>
+          <p className="text-center text-muted-foreground">
+            You reviewed {quizSize} {quizSize === 1 ? "card" : "cards"}
+          </p>
+          <Button onClick={handleStart} className="h-12">
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Start New Quiz
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardContent className="space-y-6 pt-6">
+        <p className="text-center text-sm text-muted-foreground">
+          Card {shownCount} of {quizSize}
+        </p>
         <div className="space-y-2">
           <p className="text-sm font-medium text-muted-foreground">English</p>
           <p className="text-xl">{currentPair.english}</p>
@@ -91,16 +127,14 @@ export function QuizCard() {
           <p className="text-sm font-medium text-muted-foreground">Japanese</p>
           {revealed ? (
             <div className="flex items-center gap-2">
-              <p className="text-2xl font-medium text-primary">
-                {currentPair.japanese}
-              </p>
+              <JapaneseDisplay japanese={currentPair.japanese} size="lg" />
               {speechSupported && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleSpeak}
                   aria-label="Play audio"
-                  className="h-10 w-10"
+                  className="h-10 w-10 self-start"
                 >
                   <Volume2 className="h-5 w-5" />
                 </Button>

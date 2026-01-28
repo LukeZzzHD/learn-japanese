@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { JapaneseDisplay } from "@/components/japanese-display";
 import { TranslationPair } from "@/types";
 import { Pencil, Trash2, Check, X } from "lucide-react";
 
@@ -87,9 +88,7 @@ export function PairItem({ pair, onUpdate, onDelete }: PairItemProps) {
       <CardContent className="flex items-start justify-between gap-4 pt-4">
         <div className="min-w-0 flex-1 space-y-1">
           <p className="truncate text-sm">{pair.english}</p>
-          <p className="truncate text-lg font-medium text-primary">
-            {pair.japanese}
-          </p>
+          <JapaneseDisplay japanese={pair.japanese} size="sm" />
         </div>
         <div className="flex gap-1">
           <Button
